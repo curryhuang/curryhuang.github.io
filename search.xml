@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+    
+    <entry>
+      <title><![CDATA[使用PhpStorm+xdebug远程调试php]]></title>
+      <url>http://curryhuang.com/2015/12/16/debug-php-in-phpstorm/</url>
+      <content type="html"><![CDATA[<h2 id="软件配置"><a href="#软件配置" class="headerlink" title="软件配置"></a>软件配置</h2><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mac os</td>
+<td>10.11.2</td>
+</tr>
+<tr>
+<td>nginx</td>
+<td>1.6.3</td>
+</tr>
+<tr>
+<td>php-fpm</td>
+<td></td>
+</tr>
+<tr>
+<td>xdebug</td>
+<td>2.4.0rc3</td>
+</tr>
+<tr>
+<td>php</td>
+<td>5.6.7</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装xdebug"><a href="#安装xdebug" class="headerlink" title="安装xdebug"></a>安装xdebug</h2><ol>
+<li>从<a href="http://xdebug.org/download.php" target="_blank" rel="external">xdebug</a>官网下载xdebug的源码</li>
+<li>解压<code>tar -xvzf xdebug-2.4.0rc3.tgz</code></li>
+<li><code>cd xdebug-2.4.0RC3</code></li>
+<li><code>./configure</code></li>
+<li><code>make</code></li>
+<li><code>cp module/xdebug.so &lt;any/path/you/want&gt;</code></li>
+</ol>
+<h2 id="加载xdebug"><a href="#加载xdebug" class="headerlink" title="加载xdebug"></a>加载xdebug</h2><p>修改php.ini文件，新增以下配置后重启php-fpm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[Xdebug]</div><div class="line">zend_extension=&lt;xdebug.so所在的位置&gt;           # 加载xdebug动态库，注意是zend_extension </div><div class="line">xdebug.remote_enable=1                       # 打开xdebug</div><div class="line">xdebug.remote_autostart=1                    # 打开自动监听，否则需要每次调试时在url中手动添加该参数</div><div class="line">xdebug.remote_port=&lt;xdebug监听端口(默认9000)&gt;  # php-fpm会默认监听9000端口，所以这地方需要换一个端口</div></pre></td></tr></table></figure>
+<h2 id="PhpStorm设置"><a href="#PhpStorm设置" class="headerlink" title="PhpStorm设置"></a>PhpStorm设置</h2><ol>
+<li><p>到<code>Preferences-&gt;Languages &amp; Framworks-&gt;PHP</code>中配置解释器，如果没有先添加一个，xdebug正确加载会显示在右下角，否则说明xdebug没有正确配置</p>
+<p> <img src="config-interpreter.png" alt="config interpreter"></p>
+<p> <img src="add-interpreter.png" alt="add interpreter"></p>
+</li>
+<li>到<code>Preferences-&gt;Languages &amp; Framworks-&gt;PHP-&gt;Debug</code>中配置xdebug的监听端口，需要同<code>xdebug.remote_port</code>设置的一致</li>
+<li><p>使用<code>Run-&gt;Web Server Debug Validation</code>检查debug的配置</p>
+<p> <img src="validate-config.png" alt="validate-config"></p>
+</li>
+<li><p>最后打开监听，添加断点就可以调试了</p>
+<p> <img src="enable-listen.png" alt="enable-listen"><br> <img src="stop-at-breakpoint.png" alt="stop-at-breakpoint"></p>
+</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.jetbrains.com/phpstorm/help/configuring-xdebug.html#updatingPhpIni" target="_blank" rel="external">Configuring Xdebug</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[使用grep/sed/awk提取字符串]]></title>
+      <url>http://curryhuang.com/2015/07/18/extract-string-by-grep-sed-awk/</url>
+      <content type="html"><![CDATA[<p>最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。</p>
+<h3 id="任务描述"><a href="#任务描述" class="headerlink" title="任务描述"></a>任务描述</h3><p>日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段<code>ts=</code>之后的字符串，然后进行排序，排序和求top比较容易，<code>sort -nr | head -n 10</code>即可，比较麻烦的是从字符串中提取数字。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[2015-07-18 11:00:01,807]\t[service_name]\t[INFO]\t[172.0.0.1]\t[api/mock_api1]\t[ts=239]</div></pre></td></tr></table></figure>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>Google了一番以后，发现grep/sed/awk均可以，下面分别说一下每一种方案。</p>
+<p><em>以下方案均在CentOS6上测试通过</em></p>
+<h4 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">grep -Eo <span class="string">'\[ts=[0-9]+\]'</span> |\</div><div class="line">grep -Eo <span class="string">'[0-9]+'</span></div></pre></td></tr></table></figure>
+<p>grep参数说明：</p>
+<p><code>E</code> 使用正则表达式</p>
+<p><code>o</code> 只返回匹配的部分</p>
+<p>分两部匹配，第一步提取出<code>[ts=xxxx]</code>，第二步提取出数字</p>
+<h4 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">grep -Eo <span class="string">'\[ts=[0-9]+\]'</span> |\</div><div class="line">sed -r <span class="string">'s/\[ts=([0-9]+)\]/\1/g'</span></div></pre></td></tr></table></figure>
+<p>sed参数说明：</p>
+<p><code>r</code> 使用正则表达式</p>
+<p>使用sed也需要通过grep先匹配出最后一个字段，再使用sed提取数字部分，<code>\1</code>表示正则表达式中的分组1</p>
+<h4 id="gawk"><a href="#gawk" class="headerlink" title="gawk"></a>gawk</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">gawk -F<span class="string">'\t'</span> <span class="string">'match($6, /\[ts=([0-9]+)\]/, arr) &#123; print arr[1] &#125;'</span></div></pre></td></tr></table></figure>
+<p>gawk参数说明：</p>
+<p><code>F</code> 指定分隔符，这里指定为<code>tab</code></p>
+<p>match的函数参数分别为：待匹配字符串，模式，匹配后的字符串分组</p>
+<p>awk比较强大，可以直接提取出字段信息，这里使用的是gawk，gawk兼容awk语法，经测试，同样的语法awk无法满足需求，应该是gawk和awk实现有细微区别。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>如果仅仅是提取一个字段信息，三个工具都可以满足需求，相比起来，awk的功能更强大，完成字符串提取，grep和sed的能力更多依赖正则表达式，如果需要同时处理一行记录中的多个字段，比如找出访问请求最长的10个ip，grep和sed就需要很复杂的正则表达式去匹配。</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Blog搬新家了]]></title>
+      <url>http://curryhuang.com/2014/10/01/new-blog-home/</url>
+      <content type="html"><![CDATA[<p>转眼2014剩下不到100天了，最近发生太多事，算是成长道路上的一点点坎坷吧。  </p>
+<p>既然已经发生了，就得去面对。感觉需要调整一下今后的方向了，需要更加专注，加深深度。</p>
+]]></content>
+    </entry>
+    
+  
+  
+</search>

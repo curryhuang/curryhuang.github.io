@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="使用PhpStorm+xdebug远程调试php"/>
+
+
+
+
+  <meta name="keywords" content="php xdebug phpstorm" />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Curry Huang">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.1.x" />
+
+
+
+<link rel="canonical" href="http://curryhuang.com/2015/12/16/debug-php-in-phpstorm/"/>
+
+
+<meta name="description" content="软件配置
+
+
+软件
+版本
+
+
+
+
+mac os
+10.11.2
+
+
+nginx
+1.6.3
+
+
+php-fpm
+
+
+
+xdebug
+2.4.0rc3
+
+
+php
+5.6.7
+
+
+
+安装xdebug
+从xdebug官网下载xdebug的源码
+解压tar -xvzf xdebug-2.4.0rc3.tgz
+cd xdebug-2.4.0RC3
+./configure
+make
+cp module/xd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用PhpStorm+xdebug远程调试php">
+<meta property="og:url" content="http://curryhuang.com/2015/12/16/debug-php-in-phpstorm/index.html">
+<meta property="og:site_name" content="Curry Huang">
+<meta property="og:description" content="软件配置
+
+
+软件
+版本
+
+
+
+
+mac os
+10.11.2
+
+
+nginx
+1.6.3
+
+
+php-fpm
+
+
+
+xdebug
+2.4.0rc3
+
+
+php
+5.6.7
+
+
+
+安装xdebug
+从xdebug官网下载xdebug的源码
+解压tar -xvzf xdebug-2.4.0rc3.tgz
+cd xdebug-2.4.0RC3
+./configure
+make
+cp module/xd">
+<meta property="og:image" content="http://curryhuang.com/config-interpreter.png">
+<meta property="og:image" content="http://curryhuang.com/add-interpreter.png">
+<meta property="og:image" content="http://curryhuang.com/validate-config.png">
+<meta property="og:image" content="http://curryhuang.com/enable-listen.png">
+<meta property="og:image" content="http://curryhuang.com/stop-at-breakpoint.png">
+<meta property="og:updated_time" content="2017-01-31T14:02:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用PhpStorm+xdebug远程调试php">
+<meta name="twitter:description" content="软件配置
+
+
+软件
+版本
+
+
+
+
+mac os
+10.11.2
+
+
+nginx
+1.6.3
+
+
+php-fpm
+
+
+
+xdebug
+2.4.0rc3
+
+
+php
+5.6.7
+
+
+
+安装xdebug
+从xdebug官网下载xdebug的源码
+解压tar -xvzf xdebug-2.4.0rc3.tgz
+cd xdebug-2.4.0RC3
+./configure
+make
+cp module/xd">
+<meta name="twitter:image" content="http://curryhuang.com/config-interpreter.png">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.1.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e7cbcbc6c877f0f9894242ad3c946943";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+    <title> 使用PhpStorm+xdebug远程调试php · Curry Huang </title>
+  </head>
+
+  <body>
+    <div class="container">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Curry Huang</a>
+</div>
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+        <li class="menu-search">
+          <form>
+            <i class="iconfont icon-search" id="open-search"></i>
+            <input type="text" class="search-input" id="search-input" />
+            <i class="iconfont icon-close" id="close-search"></i>
+          </form>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+<div class="mobile-navbar">
+  <div class="mobile-header">
+    <div class="mobile-header-logo">
+      <a href="/." class="logo">Curry Huang</a>
+    </div>
+
+    <div class="mobile-header-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <nav class="mobile-menu">
+    
+      <a class="mobile-menu-item" href="/">
+        
+        
+          Home
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/tags">
+        
+        
+          Tags
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/categories">
+        
+        
+          Categories
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/about">
+        
+        
+          About
+        
+      </a>
+    
+  </nav>
+</div>
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          使用PhpStorm+xdebug远程调试php
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Dec 16, 2015
+        </span>
+      </div>
+    </header>
+
+    
+      <div class="post-toc" id="post-toc">
+        <h2 class="post-toc-title">Contents</h2>
+        <div class="post-toc-content">
+          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#软件配置"><span class="toc-text">软件配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装xdebug"><span class="toc-text">安装xdebug</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加载xdebug"><span class="toc-text">加载xdebug</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PhpStorm设置"><span class="toc-text">PhpStorm设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-text">参考资料</span></a></li></ol>
+        </div>
+      </div>
+    
+
+    <div class="post-content">
+      
+        <h2 id="软件配置"><a href="#软件配置" class="headerlink" title="软件配置"></a>软件配置</h2><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mac os</td>
+<td>10.11.2</td>
+</tr>
+<tr>
+<td>nginx</td>
+<td>1.6.3</td>
+</tr>
+<tr>
+<td>php-fpm</td>
+<td></td>
+</tr>
+<tr>
+<td>xdebug</td>
+<td>2.4.0rc3</td>
+</tr>
+<tr>
+<td>php</td>
+<td>5.6.7</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装xdebug"><a href="#安装xdebug" class="headerlink" title="安装xdebug"></a>安装xdebug</h2><ol>
+<li>从<a href="http://xdebug.org/download.php" target="_blank" rel="external">xdebug</a>官网下载xdebug的源码</li>
+<li>解压<code>tar -xvzf xdebug-2.4.0rc3.tgz</code></li>
+<li><code>cd xdebug-2.4.0RC3</code></li>
+<li><code>./configure</code></li>
+<li><code>make</code></li>
+<li><code>cp module/xdebug.so &lt;any/path/you/want&gt;</code></li>
+</ol>
+<h2 id="加载xdebug"><a href="#加载xdebug" class="headerlink" title="加载xdebug"></a>加载xdebug</h2><p>修改php.ini文件，新增以下配置后重启php-fpm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[Xdebug]</div><div class="line">zend_extension=&lt;xdebug.so所在的位置&gt;           # 加载xdebug动态库，注意是zend_extension </div><div class="line">xdebug.remote_enable=1                       # 打开xdebug</div><div class="line">xdebug.remote_autostart=1                    # 打开自动监听，否则需要每次调试时在url中手动添加该参数</div><div class="line">xdebug.remote_port=&lt;xdebug监听端口(默认9000)&gt;  # php-fpm会默认监听9000端口，所以这地方需要换一个端口</div></pre></td></tr></table></figure>
+<h2 id="PhpStorm设置"><a href="#PhpStorm设置" class="headerlink" title="PhpStorm设置"></a>PhpStorm设置</h2><ol>
+<li><p>到<code>Preferences-&gt;Languages &amp; Framworks-&gt;PHP</code>中配置解释器，如果没有先添加一个，xdebug正确加载会显示在右下角，否则说明xdebug没有正确配置</p>
+<p> <img src="config-interpreter.png" alt="config interpreter"></p>
+<p> <img src="add-interpreter.png" alt="add interpreter"></p>
+</li>
+<li>到<code>Preferences-&gt;Languages &amp; Framworks-&gt;PHP-&gt;Debug</code>中配置xdebug的监听端口，需要同<code>xdebug.remote_port</code>设置的一致</li>
+<li><p>使用<code>Run-&gt;Web Server Debug Validation</code>检查debug的配置</p>
+<p> <img src="validate-config.png" alt="validate-config"></p>
+</li>
+<li><p>最后打开监听，添加断点就可以调试了</p>
+<p> <img src="enable-listen.png" alt="enable-listen"><br> <img src="stop-at-breakpoint.png" alt="stop-at-breakpoint"></p>
+</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.jetbrains.com/phpstorm/help/configuring-xdebug.html#updatingPhpIni" target="_blank" rel="external">Configuring Xdebug</a></p>
+
+      
+    </div>
+
+    
+      <footer class="post-footer">
+        <div class="post-tags">
+          
+            <a href="/tags/php/">php</a>
+          
+            <a href="/tags/xdebug/">xdebug</a>
+          
+            <a href="/tags/phpstorm/">phpstorm</a>
+          
+        </div>
+
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2015/07/18/extract-string-by-grep-sed-awk/">
+        <span class="next-text nav-default">使用grep/sed/awk提取字符串</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:huangpeng1009@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/Curry_Huang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+        
+          <a href="https://www.facebook.com/curry.huang.1009" class="iconfont icon-facebook" title="facebook"></a>
+        
+      
+    
+      
+        
+          <a href="https://github.com/curryhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+        
+          <a href="http://weibo.com/spaisp" class="iconfont icon-weibo" title="weibo"></a>
+        
+      
+    
+      
+    
+    
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2014 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Curry Huang</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+
+  <script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://curryhuang.com/2015/12/16/debug-php-in-phpstorm/';
+        this.page.identifier = '2015/12/16/debug-php-in-phpstorm/';
+        this.page.title = '使用PhpStorm+xdebug远程调试php';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+
+    s.src = '//curryhuang.disqus.com/embed.js';
+
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();  
+  </script>
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.1.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.1.x"></script>
+
+  </body>
+</html>

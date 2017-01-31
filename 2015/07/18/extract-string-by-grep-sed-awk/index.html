@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="使用grep/sed/awk提取字符串"/>
+
+
+
+
+  <meta name="keywords" content="grep sed awk linux 字符串" />
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Curry Huang">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.1.x" />
+
+
+
+<link rel="canonical" href="http://curryhuang.com/2015/07/18/extract-string-by-grep-sed-awk/"/>
+
+
+<meta name="description" content="最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。
+任务描述日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段ts=之后的字符串，然后进行排序，排序和求top比较容易，sort -nr | head -n 10即可，比较麻烦的是从字符串中提取数字。
+1[2015-07-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用grep/sed/awk提取字符串">
+<meta property="og:url" content="http://curryhuang.com/2015/07/18/extract-string-by-grep-sed-awk/index.html">
+<meta property="og:site_name" content="Curry Huang">
+<meta property="og:description" content="最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。
+任务描述日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段ts=之后的字符串，然后进行排序，排序和求top比较容易，sort -nr | head -n 10即可，比较麻烦的是从字符串中提取数字。
+1[2015-07-">
+<meta property="og:updated_time" content="2017-01-31T14:56:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用grep/sed/awk提取字符串">
+<meta name="twitter:description" content="最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。
+任务描述日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段ts=之后的字符串，然后进行排序，排序和求top比较容易，sort -nr | head -n 10即可，比较麻烦的是从字符串中提取数字。
+1[2015-07-">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.1.x" />
+
+
+
+  <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e7cbcbc6c877f0f9894242ad3c946943";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+    <title> 使用grep/sed/awk提取字符串 · Curry Huang </title>
+  </head>
+
+  <body>
+    <div class="container">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Curry Huang</a>
+</div>
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            
+            
+              Tags
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            
+            
+              Categories
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+      
+        <li class="menu-search">
+          <form>
+            <i class="iconfont icon-search" id="open-search"></i>
+            <input type="text" class="search-input" id="search-input" />
+            <i class="iconfont icon-close" id="close-search"></i>
+          </form>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+<div class="mobile-navbar">
+  <div class="mobile-header">
+    <div class="mobile-header-logo">
+      <a href="/." class="logo">Curry Huang</a>
+    </div>
+
+    <div class="mobile-header-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <nav class="mobile-menu">
+    
+      <a class="mobile-menu-item" href="/">
+        
+        
+          Home
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/tags">
+        
+        
+          Tags
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/categories">
+        
+        
+          Categories
+        
+      </a>
+    
+      <a class="mobile-menu-item" href="/about">
+        
+        
+          About
+        
+      </a>
+    
+  </nav>
+</div>
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          使用grep/sed/awk提取字符串
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Jul 18, 2015
+        </span>
+      </div>
+    </header>
+
+    
+      <div class="post-toc" id="post-toc">
+        <h2 class="post-toc-title">Contents</h2>
+        <div class="post-toc-content">
+          <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#任务描述"><span class="toc-text">任务描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决方案"><span class="toc-text">解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#grep"><span class="toc-text">grep</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sed"><span class="toc-text">sed</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gawk"><span class="toc-text">gawk</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+        </div>
+      </div>
+    
+
+    <div class="post-content">
+      
+        <p>最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。</p>
+<h3 id="任务描述"><a href="#任务描述" class="headerlink" title="任务描述"></a>任务描述</h3><p>日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段<code>ts=</code>之后的字符串，然后进行排序，排序和求top比较容易，<code>sort -nr | head -n 10</code>即可，比较麻烦的是从字符串中提取数字。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[2015-07-18 11:00:01,807]\t[service_name]\t[INFO]\t[172.0.0.1]\t[api/mock_api1]\t[ts=239]</div></pre></td></tr></table></figure>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>Google了一番以后，发现grep/sed/awk均可以，下面分别说一下每一种方案。</p>
+<p><em>以下方案均在CentOS6上测试通过</em></p>
+<h4 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">grep -Eo <span class="string">'\[ts=[0-9]+\]'</span> |\</div><div class="line">grep -Eo <span class="string">'[0-9]+'</span></div></pre></td></tr></table></figure>
+<p>grep参数说明：</p>
+<p><code>E</code> 使用正则表达式</p>
+<p><code>o</code> 只返回匹配的部分</p>
+<p>分两部匹配，第一步提取出<code>[ts=xxxx]</code>，第二步提取出数字</p>
+<h4 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">grep -Eo <span class="string">'\[ts=[0-9]+\]'</span> |\</div><div class="line">sed -r <span class="string">'s/\[ts=([0-9]+)\]/\1/g'</span></div></pre></td></tr></table></figure>
+<p>sed参数说明：</p>
+<p><code>r</code> 使用正则表达式</p>
+<p>使用sed也需要通过grep先匹配出最后一个字段，再使用sed提取数字部分，<code>\1</code>表示正则表达式中的分组1</p>
+<h4 id="gawk"><a href="#gawk" class="headerlink" title="gawk"></a>gawk</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">grep <span class="string">"api/mock_api1"</span> sample.log |\</div><div class="line">gawk -F<span class="string">'\t'</span> <span class="string">'match($6, /\[ts=([0-9]+)\]/, arr) &#123; print arr[1] &#125;'</span></div></pre></td></tr></table></figure>
+<p>gawk参数说明：</p>
+<p><code>F</code> 指定分隔符，这里指定为<code>tab</code></p>
+<p>match的函数参数分别为：待匹配字符串，模式，匹配后的字符串分组</p>
+<p>awk比较强大，可以直接提取出字段信息，这里使用的是gawk，gawk兼容awk语法，经测试，同样的语法awk无法满足需求，应该是gawk和awk实现有细微区别。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>如果仅仅是提取一个字段信息，三个工具都可以满足需求，相比起来，awk的功能更强大，完成字符串提取，grep和sed的能力更多依赖正则表达式，如果需要同时处理一行记录中的多个字段，比如找出访问请求最长的10个ip，grep和sed就需要很复杂的正则表达式去匹配。</p>
+
+      
+    </div>
+
+    
+      <footer class="post-footer">
+        <div class="post-tags">
+          
+            <a href="/tags/grep/">grep</a>
+          
+            <a href="/tags/sed/">sed</a>
+          
+            <a href="/tags/awk/">awk</a>
+          
+            <a href="/tags/linux/">linux</a>
+          
+        </div>
+
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2015/12/16/debug-php-in-phpstorm/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">使用PhpStorm+xdebug远程调试php</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    
+    
+      <a class="next" href="/2014/10/01/new-blog-home/">
+        <span class="next-text nav-default">Blog搬新家了</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+        </div>  
+      </main>
+
+      <footer id="footer" class="footer">
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:huangpeng1009@gmail.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/Curry_Huang" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+        
+          <a href="https://www.facebook.com/curry.huang.1009" class="iconfont icon-facebook" title="facebook"></a>
+        
+      
+    
+      
+        
+          <a href="https://github.com/curryhuang" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+        
+          <a href="http://weibo.com/spaisp" class="iconfont icon-weibo" title="weibo"></a>
+        
+      
+    
+      
+    
+    
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2014 - 
+    
+    2017
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Curry Huang</span>
+  </span>
+</div>
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+
+  <script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://curryhuang.com/2015/07/18/extract-string-by-grep-sed-awk/';
+        this.page.identifier = '2015/07/18/extract-string-by-grep-sed-awk/';
+        this.page.title = '使用grep/sed/awk提取字符串';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+
+    s.src = '//curryhuang.disqus.com/embed.js';
+
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();  
+  </script>
+
+
+    
+  
+
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.1.x"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.1.x"></script>
+
+  </body>
+</html>
