@@ -16,7 +16,7 @@
 
 
 
-  <meta name="keywords" content="grep sed awk linux 字符串" />
+  <meta name="keywords" content="grep,sed,awk,linux," />
 
 
 
@@ -43,7 +43,7 @@
 <meta property="og:description" content="最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。
 任务描述日志是一个tsv文件，这里以sample.log为例，每一行大致长成下面这样，需要查看某个api的最长10次查询时间。根据记录格式，需要提取最后一个字段ts=之后的字符串，然后进行排序，排序和求top比较容易，sort -nr | head -n 10即可，比较麻烦的是从字符串中提取数字。
 1[2015-07-">
-<meta property="og:updated_time" content="2017-01-31T14:56:08.000Z">
+<meta property="og:updated_time" content="2017-02-04T08:55:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用grep/sed/awk提取字符串">
 <meta name="twitter:description" content="最近需要对日志进行分析，顺便学习了一下以前一直都没弄得太明白的awk和sed。
@@ -196,7 +196,7 @@
 
     
       <div class="post-toc" id="post-toc">
-        <h2 class="post-toc-title">Contents</h2>
+        <h2 class="post-toc-title">文章目录</h2>
         <div class="post-toc-content">
           <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#任务描述"><span class="toc-text">任务描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决方案"><span class="toc-text">解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#grep"><span class="toc-text">grep</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sed"><span class="toc-text">sed</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gawk"><span class="toc-text">gawk</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
         </div>
@@ -249,13 +249,13 @@
       <a class="prev" href="/2015/12/16/debug-php-in-phpstorm/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text nav-default">使用PhpStorm+xdebug远程调试php</span>
-        <span class="prev-text nav-mobile">Prev</span>
+        <span class="prev-text nav-mobile">上一篇</span>
       </a>
     
     
       <a class="next" href="/2014/10/01/new-blog-home/">
         <span class="next-text nav-default">Blog搬新家了</span>
-        <span class="prev-text nav-mobile">Next</span>
+        <span class="prev-text nav-mobile">下一篇</span>
         <i class="iconfont icon-right"></i>
       </a>
     
@@ -326,11 +326,11 @@
 
 <div class="copyright">
   <span class="power-by">
-    Powered by <a class="hexo-link" href="https://hexo.io/" rel="external nofollow">Hexo</a>
+    由 <a class="hexo-link" href="https://hexo.io/" rel="external nofollow">Hexo</a> 强力驱动
   </span>
   
   <span class="theme-info">
-    Theme - 
+    主题 - 
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even" rel="external nofollow">Even</a>
   </span>
 
